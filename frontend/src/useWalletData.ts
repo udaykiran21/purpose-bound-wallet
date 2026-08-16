@@ -16,6 +16,7 @@ interface Contract {
   contract_id: string;
   wallet_id: string;
   payee_id: string;
+  payee_account_number?: string;
   amount: string;
   status: 'LOCKED' | 'EXECUTED' | 'REVOKED';
   created_at: string;

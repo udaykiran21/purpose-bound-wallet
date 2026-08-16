@@ -13,6 +13,7 @@ const formatCurrency = (amount: string | number) => {
 function App() {
   const { wallet, contracts, loading, refetch } = useWalletData();
   const [payeeId, setPayeeId] = useState('');
+  const [payeeAccountNumber, setPayeeAccountNumber] = useState('');
   const [amount, setAmount] = useState('');
   const [pin, setPin] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
@@ -35,11 +36,13 @@ function App() {
     try {
       await axios.post('/api/pbm/create', {
         payeeId,
+        payeeAccountNumber,
         amount: parseFloat(amount),
         vault_pin: pin,
       });
       showMessage(`Funds successfully locked for ${payeeId}.`, 'success');
       setPayeeId('');
+      setPayeeAccountNumber('');
       setAmount('');
       setPin('');
       refetch();
@@ -127,6 +130,10 @@ function App() {
                 <input required type="text" value={payeeId} onChange={e => setPayeeId(e.target.value)} className="w-full border border-slate-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. Acme Corp" />
               </div>
               <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Payee Account Number</label>
+                <input type="text" value={payeeAccountNumber} onChange={e => setPayeeAccountNumber(e.target.value)} className="w-full border border-slate-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g. 123456789" />
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Amount</label>
                 <input required type="number" min="0.01" step="0.01" value={amount} onChange={e => setAmount(e.target.value)} className="w-full border border-slate-300 rounded-md px-3 py-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0.00" />
               </div>
@@ -148,6 +155,7 @@ function App() {
                 <thead className="text-xs text-slate-500 uppercase bg-slate-50">
                   <tr>
                     <th className="px-4 py-3">Payee</th>
+                    <th className="px-4 py-3">Account Number</th>
                     <th className="px-4 py-3">Amount</th>
                     <th className="px-4 py-3">Status</th>
                     <th className="px-4 py-3 text-right">Actions</th>
@@ -157,6 +165,7 @@ function App() {
                   {contracts.map(c => (
                     <tr key={c.contract_id} className="border-b last:border-0 hover:bg-slate-50">
                       <td className="px-4 py-3 font-medium">{c.payee_id}</td>
+                      <td className="px-4 py-3 text-slate-500">{c.payee_account_number || '-'}</td>
                       <td className="px-4 py-3">{formatCurrency(c.amount)}</td>
                       <td className="px-4 py-3">
                         <span className={`px-2 py-1 rounded text-xs font-semibold ${
@@ -182,7 +191,7 @@ function App() {
                   ))}
                   {contracts.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="px-4 py-8 text-center text-slate-500">No contracts found.</td>
+                      <td colSpan={5} className="px-4 py-8 text-center text-slate-500">No contracts found.</td>
                     </tr>
                   )}
                 </tbody>
