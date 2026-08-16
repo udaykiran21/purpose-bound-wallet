@@ -53,7 +53,7 @@ export class LedgerService {
     }
   }
 
-  public async createContract(walletId: string, payeeId: string, amount: number) {
+  public async createContract(walletId: string, payeeId: string, payeeAccountNumber: string | undefined, amount: number) {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
@@ -78,8 +78,8 @@ export class LedgerService {
 
       // Create contract
       const contractRes = await client.query(
-        'INSERT INTO purpose_bound_contracts (wallet_id, payee_id, amount, status) VALUES ($1, $2, $3, $4) RETURNING contract_id',
-        [walletId, payeeId, amount, 'LOCKED']
+        'INSERT INTO purpose_bound_contracts (wallet_id, payee_id, payee_account_number, amount, status) VALUES ($1, $2, $3, $4, $5) RETURNING contract_id',
+        [walletId, payeeId, payeeAccountNumber || null, amount, 'LOCKED']
       );
       const contractId = contractRes.rows[0].contract_id;
 

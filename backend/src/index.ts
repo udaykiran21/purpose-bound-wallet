@@ -61,7 +61,7 @@ app.get('/api/pbm/contracts', async (req, res) => {
 app.post('/api/pbm/create', async (req, res) => {
   try {
     const walletId = req.headers['x-wallet-id'] as string;
-    const { payeeId, amount, vault_pin } = req.body;
+    const { payeeId, payeeAccountNumber, amount, vault_pin } = req.body;
 
     if (!payeeId || !amount || !vault_pin) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -72,7 +72,7 @@ app.post('/api/pbm/create', async (req, res) => {
       return res.status(401).json({ error: 'Invalid Vault PIN' });
     }
 
-    const result = await ledgerService.createContract(walletId, payeeId, amount);
+    const result = await ledgerService.createContract(walletId, payeeId, payeeAccountNumber, amount);
     res.status(201).json(result);
   } catch (error: any) {
     res.status(400).json({ error: error.message });
